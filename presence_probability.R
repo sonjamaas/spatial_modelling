@@ -7,14 +7,14 @@ install.packages("rgdal", repos="http://R-Forge.R-project.org")
 library(rgdal)
 library(sp)
 library(raster)
-
-occ <- readOGR("C:/Users/sonja/Documents/Dokumente/Studium/Master/Spatio_temporal_modelling/occurence.gpkg")
+# for laptop
+# occ <- readOGR("C:/Users/sonja/Documents/Dokumente/Studium/Master/Spatio_temporal_modelling/occurence.gpkg")
 
 class(occ)
 summary(occ)
 plot(occ)
-
-bui <- readOGR("C:/Users/sonja/Documents/Dokumente/Studium/Master/Spatio_temporal_modelling/campus_buildings.gpkg")
+# for laptop
+# bui <- readOGR("C:/Users/sonja/Documents/Dokumente/Studium/Master/Spatio_temporal_modelling/campus_buildings.gpkg")
 plot(bui)
 
 # plotting additional infos of the points
