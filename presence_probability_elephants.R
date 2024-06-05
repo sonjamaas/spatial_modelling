@@ -25,23 +25,24 @@ r <- rast(riverData, ncols = 500, nrows = 500) #10000 makes it VERY big and it t
 r_pred <- rasterize(riverData, r, progress = "text")
 plot(r_pred)
 
-pred.d <- terra::distance(r_pred)
-names(pred.d) <- "dist"
-plot(pred.d)
-
-e <- terra::extract(pred.d, elephantData)
-
-# combine with response (excluding the ID column)
-v <- data.frame(cbind(pa=elephantData$true, dist = e$dist))
-
-# build a model, here with glm
-model <- glm(formula=pa~., data=v)
-model
-
-# predict to a raster
-r1 <- terra::predict(pred.d, model)
-
-plot(r1)
+## make first prediction based on all rivers
+# pred.d <- terra::distance(r_pred)
+# names(pred.d) <- "dist"
+# plot(pred.d)
+# 
+# e <- terra::extract(pred.d, elephantData)
+# 
+# # combine with response (excluding the ID column)
+# v <- data.frame(cbind(pa=elephantData$true, dist = e$dist))
+# 
+# # build a model, here with glm
+# model <- glm(formula=pa~., data=v)
+# model
+# 
+# # predict to a raster
+# r1 <- terra::predict(pred.d, model)
+# 
+# plot(r1)
 
 
 ## does elephant occurance have something to do with river size? based on strahler number
@@ -119,20 +120,33 @@ v <- data.frame(cbind(pa=elephantData$true,
                       dist.strahler5=e$dist.strahler5, 
                       dist.strahler6=e$dist.strahler6))
 head(v)
-
+v1 <- na.omit(v)
+names(pred) <- names(v)[-1]
 # build a model, here with glm
-model <- glm(formula=pa~., data = v)
+model <- glm(formula=pa~., data = v1)
 model
 
 # predict to a raster
 r1 <- terra::predict(pred, model)
 
 #plot
-plot(r1, breaks = )
-plot(pred_strahler1, add =T, col= "white")
-plot(pred_strahler2, add =T, col= "#C6E2FF")
-plot(pred_strahler3, add =T, col= "#B9D3EE")
-plot(pred_strahler4, add =T, col= "#9FB6CD")
-plot(pred_strahler5, add =T, col= "slategrey")
-plot(pred_strahler6, add =T, col= "black")
+plot(r1, breaks = 50, legend = FALSE)
+plot(pred_strahler1, add =T, col= "white", lwd = 1)
+plot(pred_strahler2, add =T, col= "#C6E2FF", lwd = 2)
+plot(pred_strahler3, add =T, col= "#B9D3EE", lwd = 3)
+plot(pred_strahler4, add =T, col= "#9FB6CD", lwd = 4)
+plot(pred_strahler5, add =T, col= "slategrey", lwd = 5)
+plot(pred_strahler6, add =T, col= "darkgrey", lwd = 6)
 plot(elephantData, add = T)
+
+## make diagram of mean distance to rivers of certain strahler number
+library(tidyr)
+summary(v)
+v_long <- v %>% pivot_longer(!pa)
+ggplot(data = v_long, aes(x = name, y = value))+
+  geom_violin(draw_quantiles = TRUE)+
+  geom_point()+
+  xlab("Strhaler Number/Rank of Rivers/Streams")+
+  ylab("Distance of Elephant Observation to River/Stream")+
+  ggtitle("Importance of small Rivers for Forest Elephants")
+
